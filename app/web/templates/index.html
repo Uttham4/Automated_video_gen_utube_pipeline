@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kids Animated Video Studio - Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --accent-primary: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
+    p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+    .create-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .create-card input {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      padding: 0.85rem 1.2rem;
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .create-card input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+      color: white;
+      border: none;
+      padding: 0.85rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); }
+
+    .btn-green { background: linear-gradient(135deg, #10b981, #059669); }
+    .btn-green:hover { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+
+    .btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .btn-red:hover { box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.25); }
+
+    .thumbnail-box {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #090d16;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .thumbnail-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .card-title { font-size: 1.15rem; font-weight: 700; line-height: 1.3; }
+    .card-meta { font-size: 0.85rem; color: var(--text-muted); }
+
+    .card-actions {
+      margin-top: auto;
+      padding-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .modal-content {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      max-width: 900px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .modal-body { padding: 1.5rem; }
+    video { width: 100%; border-radius: 12px; aspect-ratio: 16/9; background: black; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-icon">🎬</span>
+      <div>
+        <h1>Kids Animated Video Studio</h1>
+        <p class="subtitle">Autonomous AI Storytelling & YouTube Publishing Engine</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="create-card">
+    <input type="text" id="topicInput" placeholder="Enter story topic (e.g. Milo the Rabbit Learns to Share)..." />
+    <button class="btn" onclick="triggerGeneration()">🚀 Generate Episode</button>
+  </div>
+
+  <h2>Episode Pipeline Queue</h2>
+  <br>
+
+  <div class="grid" id="videoGrid">
+    {% for video in videos %}
+    <div class="card">
+      <div class="thumbnail-box">
+        {% if video.thumbnail_path %}
+          <img src="/api/media?path={{ video.thumbnail_path }}" alt="Thumbnail">
+        {% else %}
+          <div style="display:flex; height:100%; align-items:center; justify-content:center; color:#64748b;">No Thumbnail</div>
+        {% endif %}
+        <span class="status-badge">{{ video.status }}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">{{ video.title }}</div>
+        <div class="card-meta">Topic: {{ video.topic }} | ID: {{ video.episode_id }}</div>
+        {% if video.error_message %}
+          <div style="color: #ef4444; font-size: 0.8rem;">Error: {{ video.error_message }}</div>
+        {% endif %}
+
+        <div class="card-actions">
+          {% if video.video_path %}
+            <button class="btn" data-action="preview" data-video-src="/api/media?path={{ video.video_path }}" data-video-title="{{ video.title }}">▶ Preview</button>
+          {% endif %}
+          
+          {% if video.status == 'WAITING_APPROVAL' %}
+            <button class="btn btn-green" data-action="approve" data-episode-id="{{ video.episode_id }}">✓ Approve</button>
+            <button class="btn btn-red" data-action="reject" data-episode-id="{{ video.episode_id }}">✕ Reject</button>
+          {% endif %}
+
+          {% if video.youtube_id %}
+            <a href="https://youtu.be/{{ video.youtube_id }}" target="_blank" class="btn" style="background:#cc0000;">YouTube</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Video Modal -->
+  <div class="modal" id="videoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Preview Episode</h3>
+        <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">✕</button>
+      </div>
+      <div class="modal-body">
+        <video id="modalVideo" controls></video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('[data-action="preview"]').forEach(button => {
+      button.addEventListener("click", () => {
+        previewVideo(button.dataset.videoSrc, button.dataset.videoTitle);
+      });
+    });
+
+    document.querySelectorAll('[data-action="approve"]').forEach(button => {
+      button.addEventListener("click", () => approveVideo(button.dataset.episodeId));
+    });
+
+    document.querySelectorAll('[data-action="reject"]').forEach(button => {
+      button.addEventListener("click", () => rejectVideo(button.dataset.episodeId));
+    });
+
+    async function triggerGeneration() {
+      const topic = document.getElementById("topicInput").value.trim();
+      if (!topic) return alert("Please enter a story topic!");
+      
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ topic })
+      });
+      const data = await res.json();
+      alert("Generation started! Episode ID: " + data.episode_id);
+      window.location.reload();
+    }
+
+    async function approveVideo(episodeId) {
+      if (!confirm("Approve episode and publish to YouTube?")) return;
+      const res = await fetch(`/api/approve/${episodeId}`, {
+        method: "POST",
+        headers: { "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content }
+      });
+      const data = await res.json();
+      alert(data.message || "Approved!");
+      window.location.reload();
+    }
+
+    async function rejectVideo(episodeId) {
+      if (!confirm("Reject episode?")) return;
+      const res = await fetch(`/api/reject/${episodeId}`, {
+        method: "POST",
+        headers: { "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content }
+      });
+      const data = await res.json();
+      alert(data.message || "Rejected.");
+      window.location.reload();
+    }
+
+    function previewVideo(src, title) {
+      document.getElementById("modalTitle").innerText = title;
+      const video = document.getElementById("modalVideo");
+      video.src = src;
+      document.getElementById("videoModal").style.display = "flex";
+      video.play();
+    }
+
+    function closeModal() {
+      const video = document.getElementById("modalVideo");
+      video.pause();
+      document.getElementById("videoModal").style.display = "none";
+    }
+  </script>
+</body>
+</html>
